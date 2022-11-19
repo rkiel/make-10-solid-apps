@@ -58,6 +58,10 @@ body {
   background: #5131a9;
   color: #eee;
 }
+.tab a.isActive {
+  background: #5131a9;
+  color: #eee;
+}
 
 .address-bar {
   background: #5533b3;
