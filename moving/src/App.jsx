@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal } from "solid-js";
+import { onMount, onCleanup, createEffect, createSignal } from "solid-js";
 import "./App.css";
 
 function App() {
@@ -17,6 +17,12 @@ function App() {
     context.clearRect(0, 0, window.innerHeight, window.innerWidth);
     context.fillRect(x(), y(), 100, 100);
   });
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+  onCleanup(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 
   function moveUp() {
     setY(y() - 20);
@@ -30,6 +36,24 @@ function App() {
   function moveRight() {
     setX(x() + 20);
   }
+
+  function handleKeyDown(e) {
+    switch (e.key) {
+      case "ArrowUp":
+        moveUp();
+        break;
+      case "ArrowLeft":
+        moveLeft();
+        break;
+      case "ArrowDown":
+        moveDown();
+        break;
+      case "ArrowRight":
+        moveRight();
+        break;
+    }
+  }
+
   return (
     <div className="app">
       <canvas ref={canvas} />
