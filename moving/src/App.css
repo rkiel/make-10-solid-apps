@@ -6,7 +6,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  /* background-image: url('https://i.imgur.com/noNWRPk.png'); */
+  background-image: url("https://i.imgur.com/noNWRPk.png");
 }
 
 .app {

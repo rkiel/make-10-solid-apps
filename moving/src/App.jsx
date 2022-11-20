@@ -1,9 +1,10 @@
-import { onMount, onCleanup, createEffect, createSignal } from "solid-js";
+import { onMount, createEffect } from "solid-js";
 import "./App.css";
 
+import useMovement from "./useMovement";
+
 function App() {
-  const [x, setX] = createSignal(0);
-  const [y, setY] = createSignal(0);
+  const { x, y, direction, move } = useMovement();
 
   let canvas;
   let linkDown, linkLeft, linkRight, linkUp;
@@ -17,67 +18,31 @@ function App() {
   createEffect(() => {
     const context = canvas.getContext("2d");
     context.clearRect(0, 0, window.innerHeight, window.innerWidth);
-    //    context.fillRect(x(), y(), 100, 100);
-    context.drawImage(linkDown, x(), y());
-  });
-  onMount(() => {
-    window.addEventListener("keydown", handleKeyDown);
-  });
-  onCleanup(() => {
-    window.removeEventListener("keydown", handleKeyDown);
-  });
-
-  function moveUp() {
-    setY(y() - 20);
-    const context = canvas.getContext("2d");
-    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
-    context.drawImage(linkUp, x(), y());
-  }
-  function moveDown() {
-    setY(y() + 20);
-    const context = canvas.getContext("2d");
-    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
-    context.drawImage(linkDown, x(), y());
-  }
-  function moveLeft() {
-    setX(x() - 20);
-    const context = canvas.getContext("2d");
-    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
-    context.drawImage(linkLeft, x(), y());
-  }
-  function moveRight() {
-    setX(x() + 20);
-    const context = canvas.getContext("2d");
-    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
-    context.drawImage(linkRight, x(), y());
-  }
-
-  function handleKeyDown(e) {
-    switch (e.key) {
-      case "ArrowUp":
-        moveUp();
+    switch (direction()) {
+      case "up":
+        context.drawImage(linkUp, x(), y());
         break;
-      case "ArrowLeft":
-        moveLeft();
+      case "down":
+        context.drawImage(linkDown, x(), y());
         break;
-      case "ArrowDown":
-        moveDown();
+      case "left":
+        context.drawImage(linkLeft, x(), y());
         break;
-      case "ArrowRight":
-        moveRight();
+      case "right":
+        context.drawImage(linkRight, x(), y());
         break;
     }
-  }
+  });
 
   return (
     <div className="app">
       <canvas ref={canvas} />
 
       <div className="arrows">
-        <button onClick={moveUp}>Up</button>
-        <button onClick={moveLeft}>Left</button>
-        <button onClick={moveDown}>Down</button>
-        <button onClick={moveRight}>Right</button>
+        <button onClick={() => move("up")}>Up</button>
+        <button onClick={() => move("left")}>Left</button>
+        <button onClick={() => move("down")}>Down</button>
+        <button onClick={() => move("right")}>Right</button>
       </div>
 
       <div className="images">
