@@ -6,8 +6,10 @@ function App() {
   const [y, setY] = createSignal(0);
 
   let canvas;
+  let linkDown, linkLeft, linkRight, linkUp;
 
   onMount(() => {
+    console.log("USE http://localhost:3000");
     const context = canvas.getContext("2d");
     context.canvas.height = window.innerHeight;
     context.canvas.width = window.innerWidth;
@@ -15,7 +17,8 @@ function App() {
   createEffect(() => {
     const context = canvas.getContext("2d");
     context.clearRect(0, 0, window.innerHeight, window.innerWidth);
-    context.fillRect(x(), y(), 100, 100);
+    //    context.fillRect(x(), y(), 100, 100);
+    context.drawImage(linkDown, x(), y());
   });
   onMount(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -26,15 +29,27 @@ function App() {
 
   function moveUp() {
     setY(y() - 20);
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
+    context.drawImage(linkUp, x(), y());
   }
   function moveDown() {
     setY(y() + 20);
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
+    context.drawImage(linkDown, x(), y());
   }
   function moveLeft() {
     setX(x() - 20);
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
+    context.drawImage(linkLeft, x(), y());
   }
   function moveRight() {
     setX(x() + 20);
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, window.innerHeight, window.innerWidth);
+    context.drawImage(linkRight, x(), y());
   }
 
   function handleKeyDown(e) {
@@ -66,10 +81,14 @@ function App() {
       </div>
 
       <div className="images">
-        <img src="https://i.imgur.com/JYUB0m3.png" alt="Down" />
-        <img src="https://i.imgur.com/GEXD7bk.gif" alt="Right" />
-        <img src="https://i.imgur.com/XSA2Oom.gif" alt="Up" />
-        <img src="https://i.imgur.com/4LGAZ8t.gif" alt="Left" />
+        <img ref={linkDown} src="https://i.imgur.com/JYUB0m3.png" alt="Down" />
+        <img
+          ref={linkRight}
+          src="https://i.imgur.com/GEXD7bk.gif"
+          alt="Right"
+        />
+        <img ref={linkUp} src="https://i.imgur.com/XSA2Oom.gif" alt="Up" />
+        <img ref={linkLeft} src="https://i.imgur.com/4LGAZ8t.gif" alt="Left" />
       </div>
     </div>
   );
