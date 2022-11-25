@@ -1,23 +1,22 @@
-import logo from './logo.svg';
-import styles from './App.module.css';
+import "./App.css";
 
 function App() {
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.jsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/solidjs/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-      </header>
+    <div className="app">
+      <h1>Unsplash Image Gallery!</h1>
+
+      <form>
+        <input type="text" placeholder="Search Unsplash..." />
+        <button>Search</button>
+      </form>
+
+      <div className="image-grid">
+        {[...Array(100)].map((_, index) => (
+          <div className="image" key={index}>
+            <img src="https://placekitten.com/g/1920/1080" alt="Sample" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
