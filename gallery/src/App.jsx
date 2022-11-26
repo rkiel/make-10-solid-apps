@@ -1,12 +1,12 @@
-import { createSignal, createEffect } from "solid-js";
+import { createResource, createSignal, createEffect } from "solid-js";
 
 import "./App.css";
 
 const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
-async function getPhotos(p) {
+async function getPhotos(page) {
   const response = await fetch(
-    `https://api.unsplash.com/photos/?client_id=${accessKey}&page=${p}`
+    `https://api.unsplash.com/photos/?client_id=${accessKey}&page=${page}`
   );
   return await response.json();
 }
@@ -25,19 +25,20 @@ function imageTag(image, index) {
   );
 }
 
-const [page, setPage] = createSignal(1);
-const [images, setImages] = createSignal([]);
-
-function onMore(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  setPage((prev) => prev + 1);
-}
-
 function App() {
+  const [page, setPage] = createSignal(1);
+  const [data] = createResource(page, getPhotos);
+  const [images, setImages] = createSignal([]);
+
+  function onMore(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setPage((prevPage) => prevPage + 1);
+  }
+
   createEffect(async () => {
-    const json = await getPhotos(page());
-    setImages((prev) => prev.concat(json));
+    const nextPage = data();
+    if (nextPage) setImages((prevImages) => prevImages.concat(nextPage));
   });
 
   return (
