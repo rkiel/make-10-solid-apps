@@ -1,12 +1,16 @@
-import { onMount, createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import "./App.css";
 import Question from "./components/Question";
 import CategorySelector from "./components/CategorySelector";
 import ResultModal from "./components/ResultModal";
 import Scoreboard from "./components/Scoreboard";
 
-async function getQuestion() {
-  const url = "https://opentdb.com/api.php?amount=1";
+async function getTrivia(category) {
+  const params = [`amount=${1}`];
+  if (category !== "any") {
+    params.push(`category=${category}`);
+  }
+  const url = `https://opentdb.com/api.php?${params.join("&")}`;
 
   const response = await fetch(url);
   const data = await response.json();
@@ -15,10 +19,11 @@ async function getQuestion() {
 
 function App() {
   const [question, setQuestion] = createSignal(null);
+  const [selectedCategory, setSelectedCategory] = createSignal("any");
 
-  onMount(async () => {
-    const result = await getQuestion();
-    setQuestion(result);
+  createEffect(async () => {
+    const trivia = await getTrivia(selectedCategory());
+    setQuestion(trivia);
   });
 
   return (
@@ -28,7 +33,10 @@ function App() {
 
       {/* question header ----------------------- */}
       <div className="question-header">
-        <CategorySelector />
+        <CategorySelector
+          category={selectedCategory()}
+          chooseCategory={setSelectedCategory}
+        />
         <Scoreboard />
       </div>
 
