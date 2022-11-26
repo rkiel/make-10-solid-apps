@@ -40,12 +40,15 @@ function App() {
   const [images, setImages] = createSignal([]);
 
   async function loadPhotos(page, query = "") {
+    setPage(page);
+
     let results;
     if (query === "") {
       results = await getPhotos(page);
     } else {
       results = await searchPhotos(page, query);
     }
+
     if (page === 1) {
       setImages(results);
     } else {
@@ -54,21 +57,18 @@ function App() {
   }
 
   function onMore(e) {
-    setPage((prevPage) => prevPage + 1);
-    loadPhotos(page(), query());
+    loadPhotos(page() + 1, query());
   }
 
   function onSearch(e) {
     e.preventDefault();
     e.stopPropagation();
-    setPage(1);
-    loadPhotos(page(), query());
+    loadPhotos(1, query());
   }
 
   function onClear() {
-    setPage(1);
     setQuery("");
-    loadPhotos(page(), query());
+    loadPhotos(1, query());
   }
 
   function onQuery(e) {
