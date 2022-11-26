@@ -1,15 +1,8 @@
-import { createResource, createSignal, createEffect } from "solid-js";
+import { createResource, createSignal, onMount } from "solid-js";
 
 import "./App.css";
 
 const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-
-async function getPhotos(page) {
-  const response = await fetch(
-    `https://api.unsplash.com/photos/?client_id=${accessKey}&page=${page}`
-  );
-  return await response.json();
-}
 
 function imageTag(image, index) {
   return (
@@ -25,30 +18,83 @@ function imageTag(image, index) {
   );
 }
 
+async function getPhotos(page) {
+  const response = await fetch(
+    `https://api.unsplash.com/photos/?client_id=${accessKey}&page=${page}`
+  );
+  const data = await response.json();
+  return data;
+}
+
+async function searchPhotos(page, query) {
+  const response = await fetch(
+    `https://api.unsplash.com/search/photos/?client_id=${accessKey}&page=${page}&query=${query}`
+  );
+  const data = await response.json();
+  return data.results;
+}
+
 function App() {
   const [page, setPage] = createSignal(1);
-  const [data] = createResource(page, getPhotos);
+  const [query, setQuery] = createSignal("");
   const [images, setImages] = createSignal([]);
 
-  function onMore(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    setPage((prevPage) => prevPage + 1);
+  async function loadPhotos(page, query = "") {
+    let results;
+    if (query === "") {
+      results = await getPhotos(page);
+    } else {
+      results = await searchPhotos(page, query);
+    }
+    if (page === 1) {
+      setImages(results);
+    } else {
+      setImages((prevImages) => prevImages.concat(results));
+    }
   }
 
-  createEffect(async () => {
-    const nextPage = data();
-    if (nextPage) setImages((prevImages) => prevImages.concat(nextPage));
+  function onMore(e) {
+    setPage((prevPage) => prevPage + 1);
+    loadPhotos(page(), query());
+  }
+
+  function onSearch(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setPage(1);
+    loadPhotos(page(), query());
+  }
+
+  function onClear() {
+    setPage(1);
+    setQuery("");
+    loadPhotos(page(), query());
+  }
+
+  function onQuery(e) {
+    setQuery(e.target.value);
+  }
+
+  onMount(() => {
+    loadPhotos(page(), query());
   });
 
   return (
     <div className="app">
-      <h1>Unsplash Image Gallery!</h1>
-
-      <form>
-        <input type="text" placeholder="Search Unsplash..." />
-        <button>Search</button>
+      <div style="display: flex; justify-content: center; ">
+        <h1>Unsplash Image Gallery!</h1>
         <button onClick={onMore}>More ({images().length})</button>
+        <button onClick={onClear}>Clear</button>
+      </div>
+
+      <form onSubmit={onSearch}>
+        <input
+          type="text"
+          placeholder="Search Unsplash..."
+          onInput={onQuery}
+          value={query()}
+        />
+        <button>Search</button>
       </form>
 
       <div className="image-grid">
